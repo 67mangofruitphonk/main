@@ -160,7 +160,8 @@ local hit_effects_data = {
     }
 }
 
-func.create_hit_effect = function(player)
+
+return function(player)
     if not getgenv().hit_effects.enabled or not player.Character then return end
 
     local character = player.Character
