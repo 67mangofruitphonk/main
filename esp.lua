@@ -442,30 +442,40 @@ utility.funcs.update = LPH_NO_VIRTUALIZE(function(player)
 end)
 
 
+local update = 0
+local frames = 1/60
+
 for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
-    if player ~= game.Players.LocalPlayer then
-        utility.funcs.render(player)
-    end
+   if player ~= game.Players.LocalPlayer then
+       utility.funcs.render(player)
+   end
 end
 
 game:GetService("Players").PlayerAdded:Connect(function(player)
-    if player ~= game.Players.LocalPlayer then
-        utility.funcs.render(player)
-    end
+   if player ~= game.Players.LocalPlayer then
+       utility.funcs.render(player)
+   end
 end)
 
 game:GetService("Players").PlayerRemoving:Connect(function(player)
-    if player ~= game.Players.LocalPlayer then
-        utility.funcs.clear_esp(player)
-    end
+   if player ~= game.Players.LocalPlayer then
+       utility.funcs.clear_esp(player)
+       cache[player] = nil
+   end
 end)
 
 connections.main = connections.main or {}
 connections.main.RenderStepped = game:GetService("RunService").Heartbeat:Connect(function()
-    for v, _ in pairs(cache) do
-        if v then
-            utility.funcs.update(v)
-        end
-    end
-end) 
+   local currentTime = tick()
+   if currentTime - update < frames then return end
+   update = currentTime
+   
+   for v, _ in pairs(cache) do
+       if v and v.Parent then
+           utility.funcs.update(v)
+       else
+           cache[v] = nil
+       end
+   end
+end)
 
